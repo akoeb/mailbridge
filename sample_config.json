@@ -1,0 +1,13 @@
+{
+  "host": "mail.example.com",
+  "port": "25",
+  "authUser": "SMTP_USER",
+  "authPassword": "SMTP_PASSWORD",
+  "recipients": {
+    "id1": "one_email@example.com",
+    "id2": "another_email@example.com"
+  },
+  "lifetime": 60,
+  "cleanupInterval": 10,
+  "tarpitInterval" : 10
+}
