@@ -11,27 +11,31 @@ import (
 )
 
 type Controller struct {
-	ActiveTokens *ActiveTokens
-	MailServer   *MailServer
-	Tarpit       *Tarpit
+	activeTokens *ActiveTokens
+	mailServer   *MailServer
+	tarpit       *Tarpit
 }
 
 func InitController(mailServer *MailServer, activeTokens *ActiveTokens, tarpit *Tarpit) *Controller {
-	c := &Controller{ActiveTokens: activeTokens, MailServer: mailServer, Tarpit: tarpit}
+	c := &Controller{
+		activeTokens: activeTokens,
+		mailServer: mailServer,
+		tarpit: tarpit,
+		}
 	return c
 }
 
 func (c *Controller) GetToken(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	// tarpit the client if we had an earlier request:
-	err := c.Tarpit.Wait(r)
+	err := c.tarpit.Wait(r)
 	if err != nil {
 		log.Printf("ERROR tarpitting user: %v", err)
 		http.Error(w, "ERROR", http.StatusBadRequest)
 		return
 	}
 
-	token, err := c.ActiveTokens.New()
+	token, err := c.activeTokens.New()
 	if err != nil {
 		log.Printf("ERROR Token Creation: %v", err)
 		http.Error(w, "ERROR", http.StatusBadRequest)
@@ -72,12 +76,12 @@ func (c *Controller) SendMail(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 	// validate token:
-	if err := c.ActiveTokens.Validate(request.Token); err != nil {
+	if err := c.activeTokens.Validate(request.Token); err != nil {
 		log.Printf("ERROR Invalid Token %v: %v", request.Token, err)
 		http.Error(w, "ERROR", http.StatusBadRequest)
 		return
 	}
-	if err := c.MailServer.Send(MessageObjectFromRequest(request)); err != nil {
+	if err := c.mailServer.Send(MessageObjectFromRequest(request)); err != nil {
 		log.Printf("ERROR Mail Sending: %v", err)
 		http.Error(w, "ERROR", http.StatusBadRequest)
 		return
