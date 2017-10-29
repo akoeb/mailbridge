@@ -67,9 +67,9 @@ This is not yet ready to use, so pre-alpha I would say.
 
 ## TODO ##
 
-* Fix Bug in tarpit
 * write tests
 * write docker file and create CI jobs 
+* add authenticated metrics endpoint with version, timestamp and counter values for requests, errors and sent mails, runtime for cleanup goroutimes
 
 ## License ##
 

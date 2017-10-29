@@ -37,7 +37,6 @@ func (c *Controller) GetToken(w http.ResponseWriter, r *http.Request, _ httprout
 		http.Error(w, "ERROR", http.StatusBadRequest)
 		return
 	}
-	// TODO: store the clients ip address and limit on this
 
 	// Marshal provided interface into JSON structure
 	o := ResponseObjectFromToken(token)

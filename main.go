@@ -12,6 +12,8 @@ import (
 	"errors"
 )
 
+const VERSION = "0.0.1"
+
 type ApplicationConfig struct {
 	Host string `json:"host"`
 	Port string `json:"port"`
