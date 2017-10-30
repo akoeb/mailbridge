@@ -49,10 +49,10 @@ type MailServer struct {
 func InitMailServer( config *ApplicationConfig) *MailServer {
 
 	return &MailServer{
-		host:              config.Host,
-		port:              config.Port,
-		authUser:          config.AuthUser,
-		authPassword:      config.AuthPassword,
+		host:              config.SmtpHost,
+		port:              config.SmptPort,
+		authUser:          config.SmtpAuthUser,
+		authPassword:      config.SmtpAuthPassword,
 		recipientMap: 	   config.RecipientMap,
 	}
 

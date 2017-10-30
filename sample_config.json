@@ -1,8 +1,9 @@
 {
-  "host": "mail.example.com",
-  "port": "25",
-  "authUser": "SMTP_USER",
-  "authPassword": "SMTP_PASSWORD",
+  "port": "8081",
+  "smtpHost": "mail.example.com",
+  "smtpPort": "25",
+  "smtpAuthUser": "SMTP_USER",
+  "smtpAuthPassword": "SMTP_PASSWORD",
   "recipients": {
     "id1": "one_email@example.com",
     "id2": "another_email@example.com"
