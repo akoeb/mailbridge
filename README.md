@@ -33,10 +33,11 @@ It exposes two endpoints:
 you will need a configuration file like the following:
 
 <pre>
-  "host": "mail.example.com",
-  "port": "25",
-  "authUser": "SMTP_USER",
-  "authPassword": "SMTP_PASSWORD",
+  "port": 8081
+  "smtpHost": "mail.example.com",
+  "smtpPort": "25",
+  "smtpAuthUser": "SMTP_USER",
+  "amtpAuthPassword": "SMTP_PASSWORD",
   "recipients": {
     "id1": "one_email@example.com",
     "id2": "another_email@example.com"
@@ -45,10 +46,11 @@ you will need a configuration file like the following:
   "cleanupInterval": 10,
   "tarpitInterval" : 10</pre>
 
-* host: the SMTP host to connect to
-* port: the SMTP port to be used
-* authUser: the Username part of the SMTP Authentication
-* authPassword: Password for the SMTP authentication
+* port : the port this application listens on.
+* smtpHost: the SMTP host to connect to
+* smtpPort: the SMTP port to be used
+* smtpAuthUser: the Username part of the SMTP Authentication
+* smtpAuthPassword: Password for the SMTP authentication
 * recipients: Map of arbitrary IDs to email addresses. The form will need to provide the defined ID, the application replaces that by the referring email address
 * lifetime: lifetime of a token in seconds, after this time a new token will expire
 * cleanupInterval: interval in seconds how often a cleanup run will delete expired tokens
