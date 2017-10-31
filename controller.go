@@ -10,22 +10,23 @@ import (
 	"net/http"
 )
 
-type Controller struct {
+type controller struct {
 	activeTokens *ActiveTokens
 	mailServer   *MailServer
 	tarpit       *Tarpit
 }
 
-func InitController(mailServer *MailServer, activeTokens *ActiveTokens, tarpit *Tarpit) *Controller {
-	c := &Controller{
-		activeTokens: activeTokens,
-		mailServer:   mailServer,
-		tarpit:       tarpit,
+
+func initController(m *MailServer, a *ActiveTokens, t *Tarpit) *controller {
+	c := &controller{
+		activeTokens: a,
+		mailServer:   m,
+		tarpit:       t,
 	}
 	return c
 }
 
-func (c *Controller) GetToken(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (c *controller) GetToken(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	// tarpit the client if we had an earlier request:
 	err := c.tarpit.Wait(r)
@@ -46,12 +47,12 @@ func (c *Controller) GetToken(w http.ResponseWriter, r *http.Request, _ httprout
 	o := ResponseObjectFromToken(token)
 	response, _ := json.Marshal(&o)
 
-	// Write content-type, statuscode, payload
+	// Write content-type, status code, payload
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	fmt.Fprintf(w, "%s\n", response)
 }
-func (c *Controller) SendMail(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (c *controller) SendMail(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		log.Printf("ERROR ReadBodyStream: %v", err)

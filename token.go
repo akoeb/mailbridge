@@ -8,10 +8,7 @@ import (
 	"time"
 )
 
-/**
-Token represents a unique token that the client must request first and provide later
-after expiration, the token can not be used any more
-*/
+// Token represents a unique one-time token with expiration that the client must request first and provide later.
 type Token struct {
 	a       [4]byte
 	b       [2]byte
@@ -21,16 +18,13 @@ type Token struct {
 	Expires time.Time
 }
 
-/**
-String representation of the token
-*/
+// String returns a string representation of the token without expiration datetime
 func (token *Token) String() string {
 	return fmt.Sprintf("%X-%X-%X-%X-%X", token.a, token.b, token.c, token.d, token.e)
 }
 
-/**
-Initialize a new random token and set expiration
-*/
+
+// Init Initializes a new random token and sets the expiration to the provided lifetime parameter [seconds] in future
 func (token *Token) Init(lifetime int) error {
 
 	// identifier
@@ -51,20 +45,16 @@ func (token *Token) Init(lifetime int) error {
 	return nil
 }
 
-/**
-This is an in memory structure that will hold all active tokens
-
-Beware: If this application dies, all active tokens die with it...
-*/
+// ActiveTokens is an in memory structure that will hold all active tokens during application lifetime
+// Beware: If this application dies, all active tokens die with it...
 type ActiveTokens struct {
 	Tokens          map[string]*Token
 	lifetime        int
 	cleanupInterval int
 }
 
-/**
-add and return a new random token
-*/
+
+// New adds a new random token to the ActiveTokens struct and returns this token
 func (at *ActiveTokens) New() (*Token, error) {
 
 	// create new token
@@ -87,26 +77,31 @@ func (at *ActiveTokens) New() (*Token, error) {
 	return token, nil
 }
 
-/**
-Get and delete a token from the map of active tokens
-will return error if the token did not exist or is expired
-will return nil if all is fine
-*/
+// Validate will check that a provided token indeed is in the ActiveTokens map and is not expired.
+// It will delete the token so it can not be used a second time.
+// An error is returned if  something went wrong or the token did not exist or was expired.
+// nil is returned if the token was valid.
 func (at *ActiveTokens) Validate(key string) error {
+
+	// check existence
 	token, ok := at.Tokens[key]
 	if !ok {
 		return errors.New("token did not exist")
 	}
+
+	// it was found, whether or not it is expired, we will delete it anyway
+	delete(at.Tokens, key)
+
+	// check expiration
 	if time.Now().After(token.Expires) {
 		return errors.New("token already expired")
 	}
-	delete(at.Tokens, key)
 	return nil
 }
 
-/**
-Iterate all tokens in the map and delete the expired ones
-*/
+
+// Clean iterates all tokens in the map and deletes the expired ones
+// this is called regularly by the ticker
 func (at *ActiveTokens) Clean() int {
 	i := 0
 	for key, token := range at.Tokens {
@@ -118,6 +113,7 @@ func (at *ActiveTokens) Clean() int {
 	return i
 }
 
+// SetupTicker creates a ticker that calls Clean() in regular intervals (config.CleanupInterval)
 func (at *ActiveTokens) SetupTicker() {
 	// create a ticker to clean up expired tokens in regular intervals
 	ticker := time.NewTicker(time.Second * time.Duration(at.cleanupInterval))
@@ -131,9 +127,7 @@ func (at *ActiveTokens) SetupTicker() {
 	}()
 }
 
-/**
-Factory function to initialize the ActiveTokens map
-*/
+// InitActiveTokens is the factory function to initialize the ActiveTokens map
 func InitActiveTokens(config *ApplicationConfig) *ActiveTokens {
 	at := &ActiveTokens{
 		lifetime:        config.Lifetime,

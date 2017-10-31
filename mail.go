@@ -9,23 +9,27 @@ import (
 	"time"
 )
 
-type Message struct {
+// EmailMessage represents the mail to be sent
+type EmailMessage struct {
 	from        string
 	to          string
 	subject     string
 	body        string
-	recipientId string
+	recipientID string
 }
 
-func (mail *Message) DecodeRecipient(recipientMap map[string]string) error {
-	to, ok := recipientMap[mail.recipientId]
+// DecodeRecipient fills in the actual recipient address from the config if only the recipient ID is given
+func (mail *EmailMessage) DecodeRecipient(recipientMap map[string]string) error {
+	to, ok := recipientMap[mail.recipientID]
 	if !ok {
-		return errors.New(fmt.Sprintf("No email for id %v", mail.recipientId))
+		return fmt.Errorf("No email for id %v", mail.recipientID)
 	}
 	mail.to = to
 	return nil
 }
-func (mail *Message) MessageBody() (string, error) {
+
+// MessageBody creates the actual message content, everything that comes after the Data command.
+func (mail *EmailMessage) MessageBody() (string, error) {
 	if mail.to == "" {
 		return "", errors.New("must decode recipient before calling MessageBody")
 	}
@@ -39,6 +43,7 @@ func (mail *Message) MessageBody() (string, error) {
 	return message, nil
 }
 
+// MailServer is the object for all sending things
 type MailServer struct {
 	host         string
 	port         string
@@ -47,19 +52,21 @@ type MailServer struct {
 	recipientMap map[string]string
 }
 
+// InitMailServer is the factory method to initialize a MailServer
 func InitMailServer(config *ApplicationConfig) *MailServer {
 
 	return &MailServer{
-		host:         config.SmtpHost,
-		port:         config.SmptPort,
-		authUser:     config.SmtpAuthUser,
-		authPassword: config.SmtpAuthPassword,
+		host:         config.SMTPHost,
+		port:         config.SMTPPort,
+		authUser:     config.SMTPAuthUser,
+		authPassword: config.SMTPAuthPassword,
 		recipientMap: config.RecipientMap,
 	}
 
 }
 
-func (server *MailServer) Send(mail *Message) error {
+// Send does the actual sending of the mail
+func (server *MailServer) Send(mail *EmailMessage) error {
 
 	// check that we are allowed to send email to this recipient
 	// and we know who that is

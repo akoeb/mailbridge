@@ -5,12 +5,13 @@ import (
 	"strings"
 )
 
+// TokenResponse represents the response object returned by the token endpoint
 type TokenResponse struct {
 	Token   string
 	Expires int64
 }
 
-// mapper
+// ResponseObjectFromToken is a mapper method that returns a TokenResponse for the HTTP endpoint from a given Token
 func ResponseObjectFromToken(token *Token) *TokenResponse {
 	return &TokenResponse{
 		Token:   token.String(),
@@ -18,6 +19,7 @@ func ResponseObjectFromToken(token *Token) *TokenResponse {
 	}
 }
 
+// SendMailRequest represents the accepted structure that clients send to the send endpoint
 type SendMailRequest struct {
 	Token   string `json:"Token"`
 	From    string `json:"From"`
@@ -26,6 +28,7 @@ type SendMailRequest struct {
 	Body    string `json:"Body"`
 }
 
+// Validate checks whether all required fields are set
 func (in *SendMailRequest) Validate() error {
 	var msg []string
 
@@ -50,10 +53,11 @@ func (in *SendMailRequest) Validate() error {
 	return nil
 }
 
-func MessageObjectFromRequest(request SendMailRequest) *Message {
-	return &Message{
+// MessageObjectFromRequest is a mapper method that returns a email message object from a given SendMailRequest
+func MessageObjectFromRequest(request SendMailRequest) *EmailMessage {
+	return &EmailMessage{
 		from:        request.From,
-		recipientId: request.To,
+		recipientID: request.To,
 		subject:     request.Subject,
 		body:        request.Body,
 	}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
@@ -13,32 +12,37 @@ import (
 )
 
 const (
+	// VERSION is the Application Version
 	VERSION     = "0.1.0"
+	// EmailRegexp is a regular expression to validate email addresses
 	EmailRegexp = `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
 )
 
+// ApplicationConfig represents the configuration that is filled from the config file
 type ApplicationConfig struct {
 	Port             string            `json:"port"`
-	SmtpHost         string            `json:"smtpHost"`
-	SmptPort         string            `json:"smtpPort"`
-	SmtpAuthUser     string            `json:"smtpAuthUser"`
-	SmtpAuthPassword string            `json:"smtpAuthPassword"`
+	SMTPHost         string            `json:"smtpHost"`
+	SMTPPort         string            `json:"smtpPort"`
+	SMTPAuthUser     string            `json:"smtpAuthUser"`
+	SMTPAuthPassword string            `json:"smtpAuthPassword"`
 	RecipientMap     map[string]string `json:"recipients"`
 	Lifetime         int               `json:"lifetime"`
 	CleanupInterval  int               `json:"cleanupInterval"`
 	TarpitInterval   int               `json:"tarpitInterval"`
 }
 
+// validateConfig validates the configuration, currently simply validates the email addresses
 func (c *ApplicationConfig) validateConfig() error {
 	Re := regexp.MustCompile(EmailRegexp)
 	for _, v := range c.RecipientMap {
 		if !Re.MatchString(v) {
-			return errors.New(fmt.Sprintf("Config Error: not a email address: %v", v))
+			return fmt.Errorf("config Error: not a email address: %v", v)
 		}
 	}
 	return nil
 }
 
+// loadConfig loads the configuration from the provided config file
 func loadConfig(fileName *string) (*ApplicationConfig, error) {
 	//filename is the path to the json config file
 	var config ApplicationConfig
@@ -60,6 +64,7 @@ func loadConfig(fileName *string) (*ApplicationConfig, error) {
 	return &config, nil
 }
 
+// main starts the application
 func main() {
 
 	var configFile = flag.String("configFile", "config.json", "Configuration File")
@@ -86,7 +91,7 @@ func main() {
 	tarpit := InitTarpit(config)
 
 	// initialize the controller
-	c := InitController(mailServer, activeTokens, tarpit)
+	c := initController(mailServer, activeTokens, tarpit)
 
 	// now set up the router
 	router.GET("/api/token", c.GetToken)

@@ -25,20 +25,20 @@ func TestMain_LoadConfigFile(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error in config file loading but should not %v", err)
 	}
-	if config.SmtpHost != "mail.example.com" {
-		t.Errorf("Error in loadConfig: %v is %v but should be %v", "SmtpHost", config.SmtpHost, "mail.example.com")
+	if config.SMTPHost != "mail.example.com" {
+		t.Errorf("Error in loadConfig: %v is %v but should be %v", "SMTPHost", config.SMTPHost, "mail.example.com")
 	}
-	if config.SmptPort != "25" {
-		t.Errorf("Error in loadConfig: %v is %v but should be %v", "SmptPort", config.SmptPort, "25")
+	if config.SMTPPort != "25" {
+		t.Errorf("Error in loadConfig: %v is %v but should be %v", "SMTPPort", config.SMTPPort, "25")
 	}
 	if config.Port != "8081" {
-		t.Errorf("Error in loadConfig: %v is %v but should be %v", "Port", config.SmptPort, "8081")
+		t.Errorf("Error in loadConfig: %v is %v but should be %v", "Port", config.SMTPPort, "8081")
 	}
-	if config.SmtpAuthUser != "SMTP_USER" {
-		t.Errorf("Error in loadConfig: %v is %v but should be %v", "AuthUser", config.SmtpAuthUser, "SMTP_USER")
+	if config.SMTPAuthUser != "SMTP_USER" {
+		t.Errorf("Error in loadConfig: %v is %v but should be %v", "AuthUser", config.SMTPAuthUser, "SMTP_USER")
 	}
-	if config.SmtpAuthPassword != "SMTP_PASSWORD" {
-		t.Errorf("Error in loadConfig: %v is %v but should be %v", "AuthPassword", config.SmtpAuthPassword, "SMTP_PASSWORD")
+	if config.SMTPAuthPassword != "SMTP_PASSWORD" {
+		t.Errorf("Error in loadConfig: %v is %v but should be %v", "AuthPassword", config.SMTPAuthPassword, "SMTP_PASSWORD")
 	}
 	if config.Lifetime != 60 {
 		t.Errorf("Error in loadConfig: %v is %v but should be %v", "Lifetime", config.Lifetime, 60)
