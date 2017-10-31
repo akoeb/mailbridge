@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"os"
 )
 
 const (
@@ -64,6 +65,18 @@ func loadConfig(fileName *string) (*ApplicationConfig, error) {
 	return &config, nil
 }
 
+// printVersion prints out version number, and commit id if a commit file is found. Then it exists eith 0
+func printVersion() {
+	// try to read a commit file, ignore errors if we do not have one
+	raw, _ := ioutil.ReadFile("COMMIT")
+	var commit string
+	if len(raw) > 0 {
+		commit = fmt.Sprintf(" (commit %s)", string(raw))
+	}
+	log.Printf("Mailbridge Version %s%s", VERSION, commit)
+	os.Exit(0)
+}
+
 // main starts the application
 func main() {
 
@@ -73,7 +86,7 @@ func main() {
 
 	// print only version and exit
 	if *versionAndExit {
-		log.Fatalf("Mailbridge Version %v", VERSION)
+		printVersion()
 	}
 
 	// try to get config file

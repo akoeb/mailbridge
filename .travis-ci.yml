@@ -1,0 +1,47 @@
+sudo: required
+language: go
+go:
+  - 1.6
+  - 1.7
+  - 1.8
+  - 1.9
+  - tip
+
+services:
+  - docker
+env:
+  global:
+  - REPO=akoeb/mailbridge
+  - CGO_ENABLED=0
+  - GOOS=linux
+  - GOARCH=amd64
+
+before_install:
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
+  - go get github.com/golang/lint/golint
+
+script:
+  - go test -v -covermode=count -coverprofile=coverage.out
+  - go vet ./...
+  - test -z "$(gofmt -d -s . | tee /dev/stderr)"
+  - test -z "$(golint ./... | tee /dev/stderr)"
+  - $HOME/gopath/bin/goveralls  -coverprofile=coverage.out -service=travis-ci
+  - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
+  - echo ${TRAVIS_COMMIT} > COMMIT
+  - docker build -t $REPO:$TAG -f Dockerfile .
+
+after_success:
+ - docker login -u $DOCKER_USER -p $DOCKER_PASS
+ - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then docker tag $REPO:$TAG $REPO:$TRAVIS_BUILD_NUMBER; docker push $REPO:$TRAVIS_BUILD_NUMBER; fi
+ - docker push $REPO:$TAG
+
+
+branches:
+  only:
+    - master
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
