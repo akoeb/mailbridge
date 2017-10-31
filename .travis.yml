@@ -15,6 +15,7 @@ env:
   - CGO_ENABLED=0
   - GOOS=linux
   - GOARCH=amd64
+  - GO_FOR_RELEASE=1.9
 
 before_install:
   - go get golang.org/x/tools/cmd/cover
@@ -27,11 +28,12 @@ script:
   - test -z "$(gofmt -d -s . | tee /dev/stderr)"
   - test -z "$(golint ./... | tee /dev/stderr)"
   - $HOME/gopath/bin/goveralls  -coverprofile=coverage.out -service=travis-ci
-  - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
-  - echo ${TRAVIS_COMMIT} > COMMIT
-  - docker build -t $REPO:$TAG -f Dockerfile .
 
 after_success:
+ - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
+ - go build .
+ - echo ${TRAVIS_COMMIT} > COMMIT
+ - docker build -t $REPO:$TAG -f Dockerfile .
  - docker login -u $DOCKER_USER -p $DOCKER_PASS
  - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then docker tag $REPO:$TAG $REPO:$TRAVIS_BUILD_NUMBER; docker push $REPO:$TRAVIS_BUILD_NUMBER; fi
  - docker push $REPO:$TAG
