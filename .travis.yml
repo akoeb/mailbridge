@@ -27,7 +27,7 @@ script:
   - go vet ./...
   - test -z "$(gofmt -d -s . | tee /dev/stderr)"
   - test -z "$(golint ./... | tee /dev/stderr)"
-  - $HOME/gopath/bin/goveralls  -coverprofile=coverage.out -service=travis-ci
+  - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
 
 after_success:
  - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
