@@ -29,8 +29,7 @@ script:
   - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci
 
 after_success:
-  - echo $TRAVIS_GO_VERSION
-  - if [[ $TRAVIS_GO_VERSION =~ ^1\.7\.[0-9]+$ ]] ; then
+  - if go version | egrep -q '\sgo1\.7\.[0-9]\s' ; then
       go build .
       echo ${TRAVIS_COMMIT} > COMMIT
       docker build -t $REPO:$TRAVIS_BUILD_NUMBER -f Dockerfile .
