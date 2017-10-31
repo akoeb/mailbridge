@@ -1,11 +1,10 @@
 package main
 
 import (
+	"regexp"
 	"testing"
 	"time"
-	"regexp"
 )
-
 
 func TestActiveTokens_New(t *testing.T) {
 	t.Parallel()
@@ -45,16 +44,16 @@ func TestActiveTokens_New(t *testing.T) {
 
 	// regex validate token
 	Re := regexp.MustCompile(tokenRegexp)
-	if ! Re.MatchString(token.String()) {
+	if !Re.MatchString(token.String()) {
 		t.Errorf("Error in getting token: Regexp does not match: %v, token %v", tokenRegexp, token.String())
 	}
 
 	// validate this token is in the token map:
 	exists, found := activeTokens.Tokens[token.String()]
-	if ! found {
+	if !found {
 		t.Errorf("Error in getting token: Token not in active tokens map")
 	}
-	if ! compareToken(*token, *exists) {
+	if !compareToken(*token, *exists) {
 		t.Errorf("Error in getting token: Token differs from active tokens map")
 	}
 
@@ -197,10 +196,10 @@ func TestActiveTokens_Clean_TickerNonExpired(t *testing.T) {
 	if len(activeTokens.Tokens) != 2 {
 		t.Errorf("Error: active tokens map should be 2 but is %v", len(activeTokens.Tokens))
 	}
-	if _, found := activeTokens.Tokens[token1.String()]; ! found {
+	if _, found := activeTokens.Tokens[token1.String()]; !found {
 		t.Errorf("Error: active token 1 has been cleaned up but should not: %v", token1.String())
 	}
-	if _, found := activeTokens.Tokens[token2.String()]; ! found {
+	if _, found := activeTokens.Tokens[token2.String()]; !found {
 		t.Errorf("Error: active token 2 has been cleaned up but should not: %v", token2.String())
 	}
 }
@@ -219,7 +218,7 @@ func TestActiveTokens_Validate(t *testing.T) {
 		t.Errorf("Error in getting token: %v", err)
 	}
 	// token must be available
-	if _, found := activeTokens.Tokens[token.String()]; ! found {
+	if _, found := activeTokens.Tokens[token.String()]; !found {
 		t.Errorf("Error: active token not available: %v", token.String())
 	}
 
@@ -233,14 +232,13 @@ func TestActiveTokens_Validate(t *testing.T) {
 	}
 }
 
-
 func getConfig(lifetime int, cleanupInterval int) ApplicationConfig {
 	config := &ApplicationConfig{}
 	config.CleanupInterval = cleanupInterval
 	config.Lifetime = lifetime
 	return *config
 }
-func compareToken (a, b Token) bool {
+func compareToken(a, b Token) bool {
 	if &a == &b {
 		return true
 	}

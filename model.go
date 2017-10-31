@@ -1,8 +1,8 @@
 package main
 
 import (
-	"strings"
 	"errors"
+	"strings"
 )
 
 type TokenResponse struct {
@@ -25,6 +25,7 @@ type SendMailRequest struct {
 	Subject string `json:"Subject"`
 	Body    string `json:"Body"`
 }
+
 func (in *SendMailRequest) Validate() error {
 	var msg []string
 
@@ -50,10 +51,10 @@ func (in *SendMailRequest) Validate() error {
 }
 
 func MessageObjectFromRequest(request SendMailRequest) *Message {
-	return &Message {
-		from: request.From,
+	return &Message{
+		from:        request.From,
 		recipientId: request.To,
-		subject: request.Subject,
-		body: request.Body,
+		subject:     request.Subject,
+		body:        request.Body,
 	}
 }

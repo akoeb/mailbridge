@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"net/http"
-	"io/ioutil"
 	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 )
 
 type Controller struct {
@@ -19,9 +19,9 @@ type Controller struct {
 func InitController(mailServer *MailServer, activeTokens *ActiveTokens, tarpit *Tarpit) *Controller {
 	c := &Controller{
 		activeTokens: activeTokens,
-		mailServer: mailServer,
-		tarpit: tarpit,
-		}
+		mailServer:   mailServer,
+		tarpit:       tarpit,
+	}
 	return c
 }
 

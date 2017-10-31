@@ -1,11 +1,11 @@
 package main
 
 import (
-	"time"
-	"fmt"
 	"crypto/rand"
 	"errors"
+	"fmt"
 	"log"
+	"time"
 )
 
 /**
@@ -47,7 +47,7 @@ func (token *Token) Init(lifetime int) error {
 	copy(token.e[:], buf[10:])
 
 	// expiration
-	token.Expires = time.Now().Add(time.Duration(lifetime)*time.Second)
+	token.Expires = time.Now().Add(time.Duration(lifetime) * time.Second)
 	return nil
 }
 
@@ -57,8 +57,8 @@ This is an in memory structure that will hold all active tokens
 Beware: If this application dies, all active tokens die with it...
 */
 type ActiveTokens struct {
-	Tokens map[string]*Token
-	lifetime int
+	Tokens          map[string]*Token
+	lifetime        int
 	cleanupInterval int
 }
 
@@ -136,7 +136,7 @@ Factory function to initialize the ActiveTokens map
 */
 func InitActiveTokens(config *ApplicationConfig) *ActiveTokens {
 	at := &ActiveTokens{
-		lifetime: config.Lifetime,
+		lifetime:        config.Lifetime,
 		cleanupInterval: config.CleanupInterval,
 	}
 	if at.Tokens == nil {
@@ -145,4 +145,3 @@ func InitActiveTokens(config *ApplicationConfig) *ActiveTokens {
 	at.SetupTicker()
 	return at
 }
-

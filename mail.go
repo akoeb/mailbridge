@@ -10,15 +10,16 @@ import (
 )
 
 type Message struct {
-	from    string
-	to string
-	subject string
-	body    string
+	from        string
+	to          string
+	subject     string
+	body        string
 	recipientId string
 }
-func(mail *Message) DecodeRecipient(recipientMap map[string]string) error {
+
+func (mail *Message) DecodeRecipient(recipientMap map[string]string) error {
 	to, ok := recipientMap[mail.recipientId]
-	if ! ok {
+	if !ok {
 		return errors.New(fmt.Sprintf("No email for id %v", mail.recipientId))
 	}
 	mail.to = to
@@ -39,25 +40,24 @@ func (mail *Message) MessageBody() (string, error) {
 }
 
 type MailServer struct {
-	host              string
-	port              string
-	authUser          string
-	authPassword      string
+	host         string
+	port         string
+	authUser     string
+	authPassword string
 	recipientMap map[string]string
 }
 
-func InitMailServer( config *ApplicationConfig) *MailServer {
+func InitMailServer(config *ApplicationConfig) *MailServer {
 
 	return &MailServer{
-		host:              config.SmtpHost,
-		port:              config.SmptPort,
-		authUser:          config.SmtpAuthUser,
-		authPassword:      config.SmtpAuthPassword,
-		recipientMap: 	   config.RecipientMap,
+		host:         config.SmtpHost,
+		port:         config.SmptPort,
+		authUser:     config.SmtpAuthUser,
+		authPassword: config.SmtpAuthPassword,
+		recipientMap: config.RecipientMap,
 	}
 
 }
-
 
 func (server *MailServer) Send(mail *Message) error {
 
@@ -109,7 +109,7 @@ func (server *MailServer) Send(mail *Message) error {
 		log.Printf("Data")
 		return err
 	}
-	body, err :=  mail.MessageBody()
+	body, err := mail.MessageBody()
 	if err != nil {
 		log.Printf("MessageBody")
 		return err

@@ -1,21 +1,22 @@
 package main
 
 import (
-	"net"
-	"fmt"
-	"net/http"
 	"errors"
-	"time"
+	"fmt"
 	"log"
+	"net"
+	"net/http"
 	"sync"
+	"time"
 )
+
 type TarpitValue struct {
 	counter int
 	expires time.Time
 }
 type Tarpit struct {
-	tick int
-	IPAddresses  map[string]*TarpitValue
+	tick        int
+	IPAddresses map[string]*TarpitValue
 	sync.RWMutex
 }
 
@@ -34,14 +35,14 @@ func (tp *Tarpit) Wait(request *http.Request) error {
 		tp.IPAddresses[ip] = value
 	}
 	sleep := value.counter
-	value.counter ++
-	value.expires = time.Now().Add(time.Duration(tp.tick * value.counter) * time.Second)
+	value.counter++
+	value.expires = time.Now().Add(time.Duration(tp.tick*value.counter) * time.Second)
 	tp.Unlock()
-	log.Printf("Incremented counter for ip %s to %d, expires %v", ip, sleep + 1, value.expires)
+	log.Printf("Incremented counter for ip %s to %d, expires %v", ip, sleep+1, value.expires)
 	// now do the actual sleep
 	if sleep > 0 {
-		log.Printf("Sleeping for %d seconds", sleep * tp.tick)
-		time.Sleep(time.Duration(sleep * tp.tick) * time.Second)
+		log.Printf("Sleeping for %d seconds", sleep*tp.tick)
+		time.Sleep(time.Duration(sleep*tp.tick) * time.Second)
 	}
 	// done
 	return nil
@@ -118,4 +119,3 @@ func InitTarpit(config *ApplicationConfig) *Tarpit {
 	tp.SetupTicker()
 	return tp
 }
-
