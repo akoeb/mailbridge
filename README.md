@@ -1,4 +1,4 @@
-# mailbridge
+# mailbridge [![Build Status](https://travis-ci.org/akoeb/mailbridge.svg?branch=master)](https://travis-ci.org/julienschmidt/httprouter) [![Coverage Status](https://coveralls.io/repos/github/akoeb/mailbridge/badge.svg?branch=master)](https://coveralls.io/github/akoeb/mailbridge?branch=master)
 
 REST to Email Bridge for use in Web Forms
 
