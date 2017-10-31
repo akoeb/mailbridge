@@ -30,15 +30,13 @@ script:
   - go build .
 
 after_success:
-  - go version
-  - go version | egrep '\sgo1\.7\.[0-9]\s'
   - if go version | egrep -q '\sgo1\.7(\.[0-9]+)?\s' ; then
-      echo ${TRAVIS_COMMIT} > COMMIT
-      docker build -t $REPO:$TRAVIS_BUILD_NUMBER -f Dockerfile .
-      docker login -u $DOCKER_USER -p $DOCKER_PASS
-      docker tag $REPO:$TRAVIS_BUILD_NUMBER $REPO:latest
-      docker push $REPO:$TRAVIS_BUILD_NUMBER
-      docker push $REPO:latest
+      echo ${TRAVIS_COMMIT} > COMMIT ;
+      docker build -t $REPO:$TRAVIS_BUILD_NUMBER -f Dockerfile . ;
+      docker login -u $DOCKER_USER -p $DOCKER_PASS ;
+      docker tag $REPO:$TRAVIS_BUILD_NUMBER $REPO:latest ;
+      docker push $REPO:$TRAVIS_BUILD_NUMBER ;
+      docker push $REPO:latest ;
     fi
 
 branches:
