@@ -30,8 +30,9 @@ script:
   - go build .
 
 after_success:
-  - go version
-  - go version | egrep '\sgo1\.7\.[0-9]\s'
+  - wtf=$(go version)
+  - echo "WTF: $wtf"
+  - go version | egrep '\sgo1\.7\.[0-9]\s' && echo $?
   - if go version | egrep -q '\sgo1\.7\.[0-9]\s' ; then
       echo ${TRAVIS_COMMIT} > COMMIT
       docker build -t $REPO:$TRAVIS_BUILD_NUMBER -f Dockerfile .
