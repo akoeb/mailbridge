@@ -15,7 +15,6 @@ env:
     - CGO_ENABLED=0
     - GOOS=linux
     - GOARCH=amd64
-    - GO_FOR_RELEASE=1.9
 
 before_install:
   - go get golang.org/x/tools/cmd/cover
@@ -30,14 +29,15 @@ script:
   - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci
 
 after_success:
+  - echo $TRAVIS_GO_VERSION
   - if [[ $TRAVIS_GO_VERSION =~ ^1\.7\.[0-9]+$ ]] ; then
-      go build . ;
-      echo ${TRAVIS_COMMIT} > COMMIT ;
-      docker build -t $REPO:$TRAVIS_BUILD_NUMBER -f Dockerfile . ;
-      docker login -u $DOCKER_USER -p $DOCKER_PASS ;
-      docker tag $REPO:$TRAVIS_BUILD_NUMBER $REPO:latest ;
-      docker push $REPO:$TRAVIS_BUILD_NUMBER ;
-      docker push $REPO:latest ;
+      go build .
+      echo ${TRAVIS_COMMIT} > COMMIT
+      docker build -t $REPO:$TRAVIS_BUILD_NUMBER -f Dockerfile .
+      docker login -u $DOCKER_USER -p $DOCKER_PASS
+      docker tag $REPO:$TRAVIS_BUILD_NUMBER $REPO:latest
+      docker push $REPO:$TRAVIS_BUILD_NUMBER
+      docker push $REPO:latest
     fi
 
 branches:
