@@ -69,8 +69,9 @@ This is not yet ready to use, so pre-alpha I would say.
 
 ## TODO ##
 
+* make email server, tarpit and active tokens interfaces
+* create mocks for email server, tarpit and active tokens
 * write tests for mail sending, controller and for the tarpit
-* write docker file and create CI jobs 
 * add authenticated metrics endpoint with version, timestamp and counter values for requests, errors and sent mails, runtime for cleanup goroutimes
 
 ## License ##
