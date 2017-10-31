@@ -8,13 +8,13 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"regexp"
 	"os"
+	"regexp"
 )
 
 const (
 	// VERSION is the Application Version
-	VERSION     = "0.1.0"
+	VERSION = "0.1.0"
 	// EmailRegexp is a regular expression to validate email addresses
 	EmailRegexp = `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
 )

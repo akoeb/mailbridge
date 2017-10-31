@@ -16,7 +16,6 @@ type controller struct {
 	tarpit       *Tarpit
 }
 
-
 func initController(m *MailServer, a *ActiveTokens, t *Tarpit) *controller {
 	c := &controller{
 		activeTokens: a,

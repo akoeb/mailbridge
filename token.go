@@ -23,7 +23,6 @@ func (token *Token) String() string {
 	return fmt.Sprintf("%X-%X-%X-%X-%X", token.a, token.b, token.c, token.d, token.e)
 }
 
-
 // Init Initializes a new random token and sets the expiration to the provided lifetime parameter [seconds] in future
 func (token *Token) Init(lifetime int) error {
 
@@ -52,7 +51,6 @@ type ActiveTokens struct {
 	lifetime        int
 	cleanupInterval int
 }
-
 
 // New adds a new random token to the ActiveTokens struct and returns this token
 func (at *ActiveTokens) New() (*Token, error) {
@@ -98,7 +96,6 @@ func (at *ActiveTokens) Validate(key string) error {
 	}
 	return nil
 }
-
 
 // Clean iterates all tokens in the map and deletes the expired ones
 // this is called regularly by the ticker
