@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"log"
 	"net/smtp"
@@ -12,35 +11,9 @@ import (
 // EmailMessage represents the mail to be sent
 type EmailMessage struct {
 	from        string
-	to          string
 	subject     string
 	body        string
 	recipientID string
-}
-
-// DecodeRecipient fills in the actual recipient address from the config if only the recipient ID is given
-func (mail *EmailMessage) DecodeRecipient(recipientMap map[string]string) error {
-	to, ok := recipientMap[mail.recipientID]
-	if !ok {
-		return fmt.Errorf("No email for id %v", mail.recipientID)
-	}
-	mail.to = to
-	return nil
-}
-
-// MessageBody creates the actual message content, everything that comes after the Data command.
-func (mail *EmailMessage) MessageBody() (string, error) {
-	if mail.to == "" {
-		return "", errors.New("must decode recipient before calling MessageBody")
-	}
-	var message string
-	message = fmt.Sprintf("From: %s\r\n", mail.from)
-	message += fmt.Sprintf("To: %s\r\n", mail.to)
-	message += fmt.Sprintf("Date: %s\r\n", time.Now().Format(time.RFC1123Z))
-	message += fmt.Sprintf("Subject: %s\r\n", mail.subject)
-	message += "\r\n" + mail.body
-
-	return message, nil
 }
 
 // MailServer is the object for all sending things
@@ -70,10 +43,17 @@ func (server *MailServer) Send(mail *EmailMessage) error {
 
 	// check that we are allowed to send email to this recipient
 	// and we know who that is
-	err := mail.DecodeRecipient(server.recipientMap)
-	if err != nil {
-		return err
+	to, ok := server.recipientMap[mail.recipientID]
+	if !ok {
+		return fmt.Errorf("No email for id %v", mail.recipientID)
 	}
+
+	// construct the data block
+	message := fmt.Sprintf("From: %s\r\n", mail.from)
+	message += fmt.Sprintf("To: %s\r\n", to)
+	message += fmt.Sprintf("Date: %s\r\n", time.Now().Format(time.RFC1123Z))
+	message += fmt.Sprintf("Subject: %s\r\n", mail.subject)
+	message += "\r\n" + mail.body
 
 	// setup Authentication and TLS Configuration
 	auth := smtp.PlainAuth("", server.authUser, server.authPassword, server.host)
@@ -105,7 +85,7 @@ func (server *MailServer) Send(mail *EmailMessage) error {
 		log.Printf("Mail")
 		return err
 	}
-	if err := client.Rcpt(mail.to); err != nil {
+	if err := client.Rcpt(to); err != nil {
 		log.Printf("Rcpt")
 		return err
 	}
@@ -116,12 +96,7 @@ func (server *MailServer) Send(mail *EmailMessage) error {
 		log.Printf("Data")
 		return err
 	}
-	body, err := mail.MessageBody()
-	if err != nil {
-		log.Printf("MessageBody")
-		return err
-	}
-	_, err = fmt.Fprintf(wc, body)
+	_, err = fmt.Fprintf(wc, message)
 	if err != nil {
 		log.Printf("print body")
 		return err
@@ -138,6 +113,6 @@ func (server *MailServer) Send(mail *EmailMessage) error {
 		log.Printf("quit")
 		return err
 	}
-	log.Printf("Mail Sent: %v\n", mail.to)
+	log.Printf("Mail Sent: %v\n", to)
 	return nil
 }
