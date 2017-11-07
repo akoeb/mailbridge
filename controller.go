@@ -2,12 +2,15 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/julienschmidt/httprouter"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 // Controller is a object that holds all our handlers and their dependencies
