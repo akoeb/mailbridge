@@ -10,6 +10,14 @@ import (
 	"time"
 )
 
+// TarpitInterface for being able to mock Tarpit
+type TarpitInterface interface {
+	Wait(request *http.Request) error
+	Decrement() int
+	SetupTicker()
+	getIP(request *http.Request) (string, error)
+}
+
 // TarpitValue is the Value of the synced map used in tarpit. The counter represents the
 // number of times that the Wait Method has been called within tick period, and expires
 // represents the datetime in future when we start decrementing the counter
@@ -107,7 +115,7 @@ func (tp *Tarpit) SetupTicker() {
 	}()
 }
 
-// Helper method to get the IP adress of a client from either the X_FORWARDED_FOR header or the actual
+// Helper method to get the IP address of a client from either the X_FORWARDED_FOR header or the actual
 // clients IP address.
 func (tp *Tarpit) getIP(request *http.Request) (string, error) {
 	// This will only be defined when site is accessed via non-anonymous proxy

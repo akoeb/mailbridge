@@ -17,6 +17,9 @@ type EmailMessage struct {
 }
 
 // MailServer is the object for all sending things
+type MailServerInterface interface {
+	Send(*EmailMessage) error
+}
 type MailServer struct {
 	host         string
 	port         string

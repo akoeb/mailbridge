@@ -44,6 +44,14 @@ func (token *Token) Init(lifetime int) error {
 	return nil
 }
 
+// ActiveTokensInterface for being able to mock ActiveTokens
+type ActiveTokensInterface interface {
+	New() (*Token, error)
+	Validate(key string) error
+	Clean() int
+	SetupTicker()
+}
+
 // ActiveTokens is an in memory structure that will hold all active tokens during application lifetime
 // Beware: If this application dies, all active tokens die with it...
 type ActiveTokens struct {

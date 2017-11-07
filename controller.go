@@ -15,14 +15,14 @@ import (
 
 // Controller is a object that holds all our handlers and their dependencies
 type Controller struct {
-	activeTokens *ActiveTokens
-	mailServer   *MailServer
-	tarpit       *Tarpit
+	activeTokens ActiveTokensInterface
+	mailServer   MailServerInterface
+	tarpit       TarpitInterface
 	bodyLimit    int64
 }
 
 // InitController is the factory method for the controller
-func InitController(m *MailServer, a *ActiveTokens, t *Tarpit) *Controller {
+func InitController(m MailServerInterface, a ActiveTokensInterface, t TarpitInterface) *Controller {
 	c := &Controller{
 		activeTokens: a,
 		mailServer:   m,
@@ -51,7 +51,12 @@ func (c *Controller) GetToken(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	// Marshal provided interface into JSON structure
-	o := ResponseObjectFromToken(token)
+	o, err := ResponseObjectFromToken(token)
+	if err != nil {
+		log.Printf("ERROR Token Creation: %v", err)
+		http.Error(w, "ERROR", http.StatusBadRequest)
+		return
+	}
 	response, _ := json.Marshal(&o)
 
 	// Write content-type, status code, payload
@@ -109,11 +114,14 @@ type TokenResponse struct {
 }
 
 // ResponseObjectFromToken is a mapper method that returns a TokenResponse for the HTTP endpoint from a given Token
-func ResponseObjectFromToken(token *Token) *TokenResponse {
+func ResponseObjectFromToken(token *Token) (*TokenResponse, error) {
+	if token == nil {
+		return nil, fmt.Errorf("No Token created")
+	}
 	return &TokenResponse{
 		Token:   token.String(),
 		Expires: token.Expires.Unix(),
-	}
+	}, nil
 }
 
 // SendMailRequest represents the accepted structure that clients send to the send endpoint
