@@ -103,8 +103,8 @@ func main() {
 	activeTokens := InitActiveTokens(config)
 	tarpit := InitTarpit(config)
 
-	// initialize the controller
-	c := initController(mailServer, activeTokens, tarpit)
+	// initialize the Controller
+	c := InitController(mailServer, activeTokens, tarpit)
 
 	// now set up the router
 	router.GET("/api/token", c.GetToken)
