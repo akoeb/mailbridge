@@ -19,5 +19,8 @@ config.json
 # intellij
 .idea/
 
+# vscode:
+.vscode/
+
 # the binary is called mailbridge
 mailbridge
