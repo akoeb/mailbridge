@@ -57,7 +57,12 @@ func (c *Controller) GetToken(w http.ResponseWriter, r *http.Request, _ httprout
 		http.Error(w, "ERROR", http.StatusBadRequest)
 		return
 	}
-	response, _ := json.Marshal(&o)
+	response, err := json.Marshal(&o)
+	if err != nil {
+		log.Printf("ERROR Token Marshal: %v", err)
+		http.Error(w, "ERROR", http.StatusBadRequest)
+		return
+	}
 
 	// Write content-type, status code, payload
 	w.Header().Set("Content-Type", "application/json")

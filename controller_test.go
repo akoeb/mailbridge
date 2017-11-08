@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -19,6 +21,7 @@ func (ms *MockMailServer) Send(m *EmailMessage) error {
 // create mock object for activeTokens
 type MockActiveTokens struct {
 	calledNew int
+	lastToken *Token
 }
 
 func (at *MockActiveTokens) New() (*Token, error) {
@@ -35,6 +38,7 @@ func (at *MockActiveTokens) New() (*Token, error) {
 	if err != nil {
 		return nil, err
 	}
+	at.lastToken = token
 	return token, nil
 }
 func (at *MockActiveTokens) Validate(key string) error {
@@ -49,9 +53,11 @@ func (at *MockActiveTokens) SetupTicker() {
 
 // create mock object for Tarpit
 type MockTarpit struct {
+	calledWait int
 }
 
 func (tp *MockTarpit) Wait(request *http.Request) error {
+	tp.calledWait++
 	return nil
 }
 func (tp *MockTarpit) Decrement() int {
@@ -61,6 +67,10 @@ func (tp *MockTarpit) SetupTicker() {}
 func (tp *MockTarpit) getIP(request *http.Request) (string, error) {
 	return "", nil
 }
+
+// ****************************************************************** //
+//                Now we start the actual tests
+// ****************************************************************** //
 
 func TestController_GetToken(t *testing.T) {
 
@@ -77,9 +87,6 @@ func TestController_GetToken(t *testing.T) {
 
 	router.ServeHTTP(rr, req)
 
-	// TODO make sure following mocked dependencies have been called:
-	// err = tarpit.Wait(req)
-
 	// check status
 	if status := rr.Code; status != http.StatusCreated {
 		t.Errorf("Wrong status: %d", status)
@@ -92,8 +99,29 @@ func TestController_GetToken(t *testing.T) {
 	if mockActiveTokens.calledNew != 1 {
 		t.Errorf("method New() on ActiveTokens has been called wrongly. expected %d, got %d", 1, mockActiveTokens.calledNew)
 	}
+	// make sure that the Wait() Method has been called on the tarpit mock
+	if mockTarpit.calledWait != 1 {
+		t.Errorf("method Wait() on Tarpit has been called wrongly. expected %d, got %d", 1, mockTarpit.calledWait)
+	}
 	// TODO compare body with token returned by activeToken Mock
+	body, err := ioutil.ReadAll(rr.Body)
+	if err != nil {
+		t.Errorf("Error in reading token response: %v", err)
+	}
+	var response TokenResponse
+	if err := json.Unmarshal(body, &response); err != nil {
+		t.Errorf("Error in un-marshalling token response: %v", err)
+	}
+	if response.Expires != mockActiveTokens.lastToken.Expires.Unix() {
+		t.Errorf("Invalid expiration in token response, expect: %v, got: %v",
+			mockActiveTokens.lastToken.Expires.Unix(), response.Expires)
+	}
+	if response.Token != mockActiveTokens.lastToken.String() {
+		t.Errorf("Invalid token string in token response, expect: %v, got: %v",
+			mockActiveTokens.lastToken.Expires.Unix(), response.Expires)
+	}
 }
+
 func TestController_SendMail(t *testing.T) {
 	// TODO needs mocks: active tokens to validate token and mailserver to send mail
 }
