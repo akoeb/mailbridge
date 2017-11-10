@@ -34,7 +34,6 @@ func InitController(m MailServerInterface, a ActiveTokensInterface, t TarpitInte
 
 // GetToken is the handler for the /token endpoint
 func (c *Controller) GetToken(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-
 	// tarpit the client if we had an earlier request:
 	err := c.tarpit.Wait(r)
 	if err != nil {

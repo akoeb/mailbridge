@@ -25,7 +25,6 @@ func (token *Token) String() string {
 
 // Init Initializes a new random token and sets the expiration to the provided lifetime parameter [seconds] in future
 func (token *Token) Init(lifetime int) error {
-
 	// identifier
 	buf := make([]byte, 16)
 	_, err := rand.Read(buf)
@@ -62,7 +61,6 @@ type ActiveTokens struct {
 
 // New adds a new random token to the ActiveTokens struct and returns this token
 func (at *ActiveTokens) New() (*Token, error) {
-
 	// create new token
 	token := &Token{}
 	err := token.Init(at.lifetime)
@@ -88,7 +86,6 @@ func (at *ActiveTokens) New() (*Token, error) {
 // An error is returned if  something went wrong or the token did not exist or was expired.
 // nil is returned if the token was valid.
 func (at *ActiveTokens) Validate(key string) error {
-
 	// check existence
 	token, ok := at.Tokens[key]
 	if !ok {

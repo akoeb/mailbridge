@@ -32,7 +32,6 @@ type MailServer struct {
 
 // InitMailServer is the factory method to initialize a MailServer
 func InitMailServer(config *ApplicationConfig) *MailServer {
-
 	return &MailServer{
 		host:         config.SMTPHost,
 		port:         config.SMTPPort,
@@ -45,7 +44,6 @@ func InitMailServer(config *ApplicationConfig) *MailServer {
 
 // Send does the actual sending of the mail
 func (server *MailServer) Send(mail *EmailMessage) error {
-
 	// check that we are allowed to send email to this recipient
 	// and we know who that is
 	to, ok := server.recipientMap[mail.recipientID]
