@@ -71,6 +71,11 @@ func (c *Controller) GetToken(w http.ResponseWriter, r *http.Request, _ httprout
 
 // SendMail is the Handler for the /send endpoint
 func (c *Controller) SendMail(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if r.Body == nil {
+		log.Printf("ERROR Body is nil")
+		http.Error(w, "ERROR", http.StatusBadRequest)
+		return
+	}
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, c.bodyLimit))
 	if err != nil {
 		log.Printf("ERROR ReadBodyStream: %v", err)

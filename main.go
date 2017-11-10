@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/julienschmidt/httprouter"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 const (
@@ -65,7 +66,7 @@ func loadConfig(fileName *string) (*ApplicationConfig, error) {
 	return &config, nil
 }
 
-// printVersion prints out version number, and commit id if a commit file is found. Then it exists eith 0
+// printVersion prints out version number, and commit id if a commit file is found. Then it exits with 0
 func printVersion() {
 	// try to read a commit file, ignore errors if we do not have one
 	raw, _ := ioutil.ReadFile("COMMIT")
