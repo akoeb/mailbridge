@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/julienschmidt/httprouter"
@@ -22,24 +24,15 @@ func (ms *MockMailServer) Send(m *EmailMessage) error {
 type MockActiveTokens struct {
 	calledNew int
 	lastToken *Token
+	mockNew   func() (*Token, error)
 }
 
+// New delegates to mockable
 func (at *MockActiveTokens) New() (*Token, error) {
-	// TODO write test that checks what happens if token is nil
-
-	// record the call
-	at.calledNew++
-
-	// create new token
-	token := &Token{}
-
-	// new token with lifetime of 3 secs
-	err := token.Init(3)
-	if err != nil {
-		return nil, err
+	if at.mockNew != nil {
+		return at.mockNew()
 	}
-	at.lastToken = token
-	return token, nil
+	return nil, fmt.Errorf("No mocked function found")
 }
 func (at *MockActiveTokens) Validate(key string) error {
 	return nil
@@ -72,10 +65,28 @@ func (tp *MockTarpit) getIP(request *http.Request) (string, error) {
 //                Now we start the actual tests
 // ****************************************************************** //
 
-func TestController_GetToken(t *testing.T) {
+// test the positive case
+func TestController_GetTokenOK(t *testing.T) {
 
 	mockMailServer := &MockMailServer{}
 	mockActiveTokens := &MockActiveTokens{}
+	// define the mock method for New
+	mockActiveTokens.mockNew = func() (*Token, error) {
+		// record the call
+		mockActiveTokens.calledNew++
+
+		// create new token
+		token := &Token{}
+
+		// new token with lifetime of 3 secs
+		err := token.Init(3)
+		if err != nil {
+			return nil, err
+		}
+		mockActiveTokens.lastToken = token
+		return token, nil
+	}
+
 	mockTarpit := &MockTarpit{}
 
 	c := InitController(mockMailServer, mockActiveTokens, mockTarpit)
@@ -89,7 +100,7 @@ func TestController_GetToken(t *testing.T) {
 
 	// check status
 	if status := rr.Code; status != http.StatusCreated {
-		t.Errorf("Wrong status: %d", status)
+		t.Errorf("Wrong status: %d, should be %d", status, http.StatusCreated)
 	}
 	// content type
 	if cType := rr.Header().Get("Content-Type"); cType != "application/json" {
@@ -121,6 +132,40 @@ func TestController_GetToken(t *testing.T) {
 			mockActiveTokens.lastToken.Expires.Unix(), response.Expires)
 	}
 }
+
+// edge case Wait() returns error
+func TestController_GetTokenWaitError(t *testing.T) {
+
+	mockMailServer := &MockMailServer{}
+	mockActiveTokens := &MockActiveTokens{}
+	// define the mock method for New
+	mockActiveTokens.mockNew = func() (*Token, error) {
+		return nil, fmt.Errorf("returning error from New()")
+	}
+
+	mockTarpit := &MockTarpit{}
+
+	c := InitController(mockMailServer, mockActiveTokens, mockTarpit)
+	router := httprouter.New()
+	router.GET("/token", c.GetToken)
+
+	req, _ := http.NewRequest("GET", "/token", nil)
+	rr := httptest.NewRecorder()
+
+	router.ServeHTTP(rr, req)
+
+	// check status
+	if status := rr.Code; status != http.StatusBadRequest {
+		t.Errorf("Wrong status: %d, should be %d", status, http.StatusBadRequest)
+	}
+	if strings.TrimSpace(rr.Body.String()) != "ERROR" {
+		t.Errorf("GetTokenWaitError: Expected response body: %s, got %s", "ERROR", rr.Body.String())
+	}
+
+}
+
+// TODO * New() returns error
+// TODO * marshalling or response object creation fails
 
 func TestController_SendMail(t *testing.T) {
 	// TODO needs mocks: active tokens to validate token and mailserver to send mail
