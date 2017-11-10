@@ -16,10 +16,12 @@ type EmailMessage struct {
 	recipientID string
 }
 
-// MailServer is the object for all sending things
+// MailServerInterface is the object for all sending things
 type MailServerInterface interface {
 	Send(*EmailMessage) error
 }
+
+// MailServer implements MailServerInterface
 type MailServer struct {
 	host         string
 	port         string
@@ -61,7 +63,6 @@ func (server *MailServer) Send(mail *EmailMessage) error {
 	// setup Authentication and TLS Configuration
 	auth := smtp.PlainAuth("", server.authUser, server.authPassword, server.host)
 
-	// Gmail will reject connection if it's not secure
 	// TLS config
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify: true,
