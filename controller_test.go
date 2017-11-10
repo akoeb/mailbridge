@@ -67,7 +67,6 @@ func (tp *MockTarpit) getIP(request *http.Request) (string, error) {
 
 // test the positive case
 func TestController_GetTokenOK(t *testing.T) {
-
 	// initialize mocks
 	ms := &MockMailServer{}
 	at := &MockActiveTokens{}
@@ -131,7 +130,6 @@ func TestController_GetTokenOK(t *testing.T) {
 
 // edge case New() returns error
 func TestController_GetTokenNewError(t *testing.T) {
-
 	// initialize mocks
 	ms := &MockMailServer{}
 	at := &MockActiveTokens{}
