@@ -28,6 +28,24 @@ It exposes two endpoints:
     }
     </pre>
 
+## install ##
+
+* build from source
+
+    <pre>
+    cd SOURCE_DIR
+    go build -o mailbridge .
+    ./mailbridge -configFile CONFIG_FILE
+    </pre>
+
+* run from dockerhub
+
+    <pre>
+    docker run -d -v CONFIG_FILE:/config.json -p 8081:8081 akoeb/mailbridge
+    </pre> 
+
+
+
 ## config ##
 
 you will need a configuration file like the following:
